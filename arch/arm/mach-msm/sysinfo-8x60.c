@@ -65,7 +65,6 @@ static char gpio_info_buffer[GPIO_INFO_BUFFER_SIZE];
 
 /* For DDR Reg dump */
 struct _reg_data msm_ddr_registers[] = {
-	#include "msm_ddr_regs-8x60.inc"
 };
 
 /* For DDR Reg dump */
