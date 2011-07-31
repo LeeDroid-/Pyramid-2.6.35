@@ -1206,7 +1206,7 @@ dhd_preinit_ioctls(dhd_pub_t *dhd)
 	dhdcdc_set_ioctl(dhd, 0, WLC_SET_VAR, iovbuf, sizeof(iovbuf));
 
 	/* set scanresults_minrssi */
-	ret = -88;
+	ret = -98;
 	bcm_mkiovar("scanresults_minrssi", (char *)&ret, 4, iovbuf, sizeof(iovbuf));
 	dhdcdc_set_ioctl(dhd, 0, WLC_SET_VAR, iovbuf, sizeof(iovbuf));
 
