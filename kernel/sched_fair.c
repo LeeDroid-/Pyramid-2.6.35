@@ -2667,7 +2667,6 @@ static inline void calculate_imbalance(struct sd_lb_stats *sds, int this_cpu,
 		return fix_small_imbalance(sds, this_cpu, imbalance);
 
 }
-
 /******* find_busiest_group() helpers end here *********************/
 
 /**
@@ -2751,8 +2750,8 @@ find_busiest_group(struct sched_domain *sd, int this_cpu,
 	 * even when they are idle.
 	 */
 	if (idle == CPU_NEWLY_IDLE || !idle_cpu(this_cpu)) {
-		if (100 * sds.max_load <= sd->imbalance_pct * sds.this_load)
-			goto out_balanced;
+	if (100 * sds.max_load <= sd->imbalance_pct * sds.this_load)
+		goto out_balanced;
 	} else {
 		/*
 		 * This cpu is idle. If the busiest group load doesn't
@@ -2963,7 +2962,7 @@ redo:
 		 * excessive cache_hot migrations and active balances.
 		 */
 		if (idle != CPU_NEWLY_IDLE)
-			sd->nr_balance_failed++;
+		sd->nr_balance_failed++;
 
 		if (need_active_balance(sd, sd_idle, idle)) {
 			raw_spin_lock_irqsave(&busiest->lock, flags);
@@ -3086,7 +3085,7 @@ static void idle_balance(int this_cpu, struct rq *this_rq)
 			next_balance = sd->last_balance + interval;
 		if (pulled_task)
 			break;
-	}
+		}
 
 	raw_spin_lock(&this_rq->lock);
 
@@ -3704,7 +3703,6 @@ static void task_move_group_fair(struct task_struct *p, int on_rq)
  	if (!on_rq)
 		p->se.vruntime += cfs_rq_of(&p->se)->min_vruntime;
 }
-#endif
 
 static void prep_move_group_fair(struct task_struct *p, int on_rq)
 {
