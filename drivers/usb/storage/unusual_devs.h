@@ -1882,7 +1882,7 @@ UNUSUAL_DEV( 0x1908, 0x1320, 0x0000, 0x0000,
 		US_SC_DEVICE, US_PR_DEVICE, NULL,
 		US_FL_BAD_SENSE ),
 
-/* Patch by Richard Schï¿½tz <r.schtz@t-online.de>
+/* Patch by Richard Schütz <r.schtz@t-online.de>
  * This external hard drive enclosure uses a JMicron chip which
  * needs the US_FL_IGNORE_RESIDUE flag to work properly. */
 UNUSUAL_DEV(  0x1e68, 0x001b, 0x0000, 0x0000,
