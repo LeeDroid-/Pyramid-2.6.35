@@ -248,6 +248,12 @@ u32 ddl_decoder_dpb_init(struct ddl_client_context *ddl)
 	dpb = decoder->dp_buf.no_of_dec_pic_buf;
 
 	for (i = 0; i < dpb; i++) {
+               if (frame[i].vcd_frm.virtual) {
+                       memset(frame[i].vcd_frm.virtual, 0x10101010, luma_size);
+                       memset(frame[i].vcd_frm.virtual + luma_size, 0x80808080,
+                                       frame[i].vcd_frm.alloc_len - luma_size);
+               }
+
 		luma[i] = DDL_OFFSET(ddl_context->dram_base_a.
 			align_physical_addr, frame[i].vcd_frm.physical);
 		chroma[i] = luma[i] + luma_size;
