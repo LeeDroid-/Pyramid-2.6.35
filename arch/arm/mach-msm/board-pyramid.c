@@ -129,7 +129,7 @@
 #endif
 
 #define MIN_VDD 840000
-#define MAX_VDD 1375000
+#define MAX_VDD 1400000
 
 extern int panel_type;
 
