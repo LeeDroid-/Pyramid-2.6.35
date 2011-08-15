@@ -91,8 +91,6 @@
 #define SPSS1_CLK_SEL_ADDR		(MSM_ACC1_BASE + 0x08)
 #define SPSS_L2_CLK_SEL_ADDR		(MSM_GCC_BASE  + 0x38)
 
-/* Speed bin register. */
-#define QFPROM_SPEED_BIN_ADDR		(MSM_QFPROM_BASE + 0x00C0)
 
 static const void * const clk_ctl_addr[] = {SPSS0_CLK_CTL_ADDR,
 			SPSS1_CLK_CTL_ADDR};
@@ -252,9 +250,9 @@ static struct clkctl_acpu_speed acpu_freq_tbl_v2[] = {
 /* acpu_freq_tbl row to use when reconfiguring SC/L2 PLLs. */
 #define CAL_IDX 1
 
-static struct clkctl_acpu_speed *acpu_freq_tbl;
-static struct clkctl_l2_speed *l2_freq_tbl;
-static unsigned int l2_freq_tbl_size;
+static struct clkctl_acpu_speed *acpu_freq_tbl = acpu_freq_tbl_v2;
+static struct clkctl_l2_speed *l2_freq_tbl = l2_freq_tbl_v2;
+static unsigned int l2_freq_tbl_size = ARRAY_SIZE(l2_freq_tbl_v2);
 
 unsigned long acpuclk_get_rate(int cpu)
 {
@@ -360,29 +358,6 @@ static void scpll_disable(int sc_pll)
 	/* Power down SCPLL. */
 	writel(SCPLL_POWER_DOWN, sc_pll_base[sc_pll] + SCPLL_CTL_OFFSET);
 }
-
-#ifdef CONFIG_ACPUCLK_SET_RATE_DEBUG
-#define SETRATE_TIMEOUT (3 * HZ)
-struct task_struct *set_rate_process;
-static void set_rate_timeout_handler(unsigned long data)
-{
-	struct task_struct *g, *p;
-
-	pr_info("acpuclk_set_rate timeout, print stack\n");
-
-	read_lock(&tasklist_lock);
-	do_each_thread(g, p) {
-		if (p == set_rate_process )
-			sched_show_task(set_rate_process);
-	} while_each_thread(g, p);
-	read_unlock(&tasklist_lock);
-
-	pr_info("Blocked tasks\n");
-	show_state_filter(TASK_UNINTERRUPTIBLE);
-}
-
-static DEFINE_TIMER(set_rate_timer, set_rate_timeout_handler, 0, 0);
-#endif
 
 static void scpll_change_freq(int sc_pll, uint32_t l_val)
 {
@@ -570,13 +545,8 @@ int acpuclk_set_rate(int cpu, unsigned long rate, enum setrate_reason reason)
 		goto out;
 	}
 
-	if (reason == SETRATE_CPUFREQ) {
+	if (reason == SETRATE_CPUFREQ)
 		mutex_lock(&drv_state.lock);
-#ifdef CONFIG_ACPUCLK_SET_RATE_DEBUG
-		set_rate_process = current;
-		mod_timer(&set_rate_timer, jiffies + SETRATE_TIMEOUT);
-#endif
-	}
 
 	strt_s = drv_state.current_speed[cpu];
 
@@ -653,12 +623,8 @@ int acpuclk_set_rate(int cpu, unsigned long rate, enum setrate_reason reason)
 		AVS_ENABLE(cpu, tgt_s->avsdscr_setting);
 
 out:
-	if (reason == SETRATE_CPUFREQ) {
+	if (reason == SETRATE_CPUFREQ)
 		mutex_unlock(&drv_state.lock);
-#ifdef CONFIG_ACPUCLK_SET_RATE_DEBUG
-		del_timer(&set_rate_timer);
-#endif
-	}
 	return rc;
 }
 
@@ -826,9 +792,6 @@ void __init msm_acpu_clock_init(struct msm_acpu_clock_platform_data *clkdata)
 	drv_state.vdd_switch_time_us = clkdata->vdd_switch_time_us;
 
 	/* Configure hardware. */
-	acpu_freq_tbl = acpu_freq_tbl_v2;
-	l2_freq_tbl = l2_freq_tbl_v2;
-	l2_freq_tbl_size = ARRAY_SIZE(l2_freq_tbl_v2);
 	unselect_scplls();
 	scpll_set_refs();
 	for_each_possible_cpu(cpu)
